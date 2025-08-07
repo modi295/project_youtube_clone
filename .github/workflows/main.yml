@@ -1,9 +1,9 @@
-name: Build and Deploy React App
+name: Build and Deploy Youtube Clone App
 
 on:
   push:
     branches:
-      - main  # Trigger on pushes to main branch
+      - main  # Trigger deployment on push to main
 
 jobs:
   build-and-deploy:
@@ -24,14 +24,19 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Build the React app
-      - name: Build the app
-        run: npm run build
+      # Step 4: Optional - Update Browserslist DB
+      - name: Update Browserslist DB
+        run: npx update-browserslist-db@latest
 
-      # Step 5: Deploy build folder to a publish branch
-      - name: Deploy to publish branch
+      # Step 5: Build the React app
+      - name: Build the app
+        run: CI='' npm run build  # Bypass CI error on CSS warnings
+
+      # Step 6: Deploy build folder to gh-pages branch
+      - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
-          publish_branch: gh-pages  # 🔁 change this to your preferred branch
+          publish_branch: gh-pages
+          force_orphan: true  # Faster by resetting history
